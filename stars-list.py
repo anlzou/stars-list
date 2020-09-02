@@ -2,7 +2,7 @@
 # @Date        : 2020-09-02 17:51:24
 # @LastEditors : anlzou
 # @Github      : https://github.com/anlzou
-# @LastEditTime: 2020-09-02 17:54:55
+# @LastEditTime: 2020-09-02 18:40:49
 # @FilePath    : \stars-list\stars-list.py
 # @Describe    :
 #
@@ -140,13 +140,6 @@ def run(username):
     makeMarkdown()
     print("finish")
 
-
-'''
-    todo：
-    获取项目名称、评论、stars、fork
-    模板制作：显示样式，是否需要stars&fork
-    支持输入文件名，可有可无".md"
-'''
 
 if __name__ == '__main__':
     username = input("input your github username: ")
