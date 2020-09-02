@@ -2,7 +2,7 @@
  * @Date        : 2020-09-02 17:48:18
  * @LastEditors : anlzou
  * @Github      : https://github.com/anlzou
- * @LastEditTime: 2020-09-02 18:02:29
+ * @LastEditTime: 2020-09-02 18:13:40
  * @FilePath    : \stars-list\README.md
  * @Describe    : 
 -->
@@ -17,9 +17,6 @@
 
 <details><summary>Contents</summary>
 
-- [stars-list](#stars-list)
-- [Demo](#demo)
-  - [Stars-List](#stars-list-1)
   - [C++](#c)
   - [CSS](#css)
   - [HTML](#html)
