@@ -2,7 +2,7 @@
 # @Date        : 2020-09-02 17:51:24
 # @LastEditors : anlzou
 # @Github      : https://github.com/anlzou
-# @LastEditTime: 2020-09-02 18:40:49
+# @LastEditTime: 2020-09-20 13:45:27
 # @FilePath    : \stars-list\stars-list.py
 # @Describe    :
 #
@@ -31,49 +31,52 @@ headers = {
     list_title_url:project url
     list_text:project brief introduction
 '''
-data = []
 github_url = "https://github.com"
 session = HTMLSession()
 
+pages_url_result = []
+
+
 list_title = []
+list_title_ = []
 list_title_url = []
+list_title_url_ = []
 list_text = []
+list_text_ = []
+list_sarts = []
 
 
 def get_title_and_text(url):
     resp = session.get(url, headers=headers)
-    url = resp.html.xpath('//div[@class="BtnGroup"]/a[@rel="nofollow"]/@href')
-    button = resp.html.xpath(
-        '//div[@class="BtnGroup"]/a[@rel="nofollow"]/text()')
 
-    if len(url) == 0 or (len(url) == 1 and button[0] == "Next"):
-        title = resp.html.xpath(
-            '//div[@class="d-inline-block mb-1"]/h3/a/@href')
-        title_url = [github_url + i for i in title]
-        text = resp.html.xpath('//div[@class="py-1"]/p/text()')
-        text = [j.replace("\n      ", "")
-                for j in [i.replace("\n        ", "") for i in text]]
+    title = resp.html.xpath(
+        '//div[@class="d-inline-block mb-1"]/h3/a/@href')
+    title_url = [github_url + i for i in title]
+    text = resp.html.xpath('//div[@class="py-1"]/p/text()')
+    text = [j.replace("\n      ", "")
+            for j in [i.replace("\n        ", "") for i in text]]
 
-        list_title.append(title)
-        list_title_url.append(title_url)
-        list_text.append(text)
+    programmingLanguage = resp.html.xpath(
+        '//div[@class="col-12 d-block width-full py-4 border-bottom"]/div[@class="f6 text-gray mt-2"]/span/span[@itemprop="programmingLanguage"]/text()')
+    list_sarts.append(programmingLanguage)
 
-    elif len(pages_next) == 2:
-        title = resp.html.xpath(
-            '//div[@class="d-inline-block mb-1"]/h3/a/@href')
-        title_url = [github_url + i for i in title]
-        text = resp.html.xpath('//div[@class="py-1"]/p/text()')
-        text = [j.replace("\n      ", "")
-                for j in [i.replace("\n        ", "") for i in text]]
+    list_title.append(title)
+    for i in list_title:
+        for j in i:
+            list_title_.append(j[1:])
 
-        list_title.append(title)
-        list_title_url.append(title_url)
-        list_text.append(text)
+    list_title_url.append(title_url)
+    for i in list_title_url:
+        for j in i:
+            list_title_url_.append(j)
 
-        resp = session.get(pages_next[1], headers=headers)
-        pages_next = resp.html.xpath(
-            '//div[@class="BtnGroup"]/a[@rel="nofollow"]/@href')
-        get_title_and_text(resp)
+    list_text.append(text)
+    for i in list_text:
+        for j in i:
+            if j != '\n':
+                if(j[0:1] == ' '):
+                    j = j[1:]
+                list_text_.append(j)
 
 
 def get_types(username):
@@ -86,11 +89,31 @@ def get_types(username):
         "\n      ", "") for j in [i.replace("\n        ", "") for i in types]]]
     types_result = types_result[4:]  # 去掉多余
 
-    # 获取类型链接
-    urls = resp.html.xpath('//ul[@class="filter-list"]/li/a/@href')
-    urls_result = urls[4:]  # 去掉多余
+    return types_result
 
-    return types_result, urls_result
+
+def pages_url(url):
+    resp = session.get(url, headers=headers)
+    # 获取stars页面链接
+    page_url = resp.html.xpath(
+        '//div[@class="BtnGroup"]/a[@rel="nofollow"]/@href')
+    return page_url
+
+
+def get_pages_url(page_url):
+    pages_url_result.append(page_url)
+
+    page_url = pages_url(page_url)
+    for i in page_url:
+        url = str(i)
+        if(url.find('after') != -1):
+            get_pages_url(url)
+
+
+# def get_information():
+#     project_name = []
+#     project_synopsis = []
+#     project_type = []
 
 
 def makeMarkdown():
@@ -128,20 +151,28 @@ def makeMarkdown():
 
 
 def run(username):
-    type_data = get_types(username)
-    for i in type_data:
-        data.append(i)
+    # all_types = get_types(username)
+    # print(all_types)
 
-#     每个类型的页面
-    for url in data[1]:
-        get_title_and_text(url)
+    page_url = "https://github.com/" + username + "?tab=stars"
+    get_pages_url(page_url)
+    # print(pages_url_result)
+
+    for i in pages_url_result:
+        get_title_and_text(i)
+    # print(list_title_)
+    # print(list_title_url_)
+    # print(list_text_)
+
+    print(list_sarts)
 
 #     生成markdown文件
-    makeMarkdown()
-    print("finish")
+    # makeMarkdown()
+    # print("finish")
 
 
 if __name__ == '__main__':
-    username = input("input your github username: ")
+    # username = input("input your github username: ")
+    username = "anlzou"
     print("wait a moment...")
     run(username)
